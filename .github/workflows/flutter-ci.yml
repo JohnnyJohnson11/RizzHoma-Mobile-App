@@ -1,0 +1,30 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set JAVA_HOME
+      run: echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+
+    - name: Clone Flutter 3.22.1
+      run: |
+        git clone https://github.com/flutter/flutter.git --branch 3.22.1 --depth 1
+        ./flutter/bin/flutter --version
+        ./flutter/bin/flutter precache
+
+    - name: Run dart pub get
+      run: ./flutter/bin/cache/dart-sdk/bin/dart pub get
+
+    - name: Build debug APK
+      run: ./flutter/bin/flutter build apk --debug
